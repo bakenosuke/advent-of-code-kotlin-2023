@@ -19,12 +19,12 @@ fun main() {
 }
 
 fun part1(input: List<String>): Int {
-    val calibrationValues = input.map { determineCalibrationValue(it) }
+    val calibrationValues = input.map { determineCalibrationValuePart1(it) }
     return calibrationValues.sum()
 }
 
 fun part2(input: List<String>): Int {
-    val calibrationValues = input.map { determineCalibrationValue(it) }
+    val calibrationValues = input.map { determineCalibrationValuePart2(it) }
     return calibrationValues.sum()
 }
 
@@ -52,64 +52,59 @@ fun testPart2() {
     println("Passed")
 }
 
-fun determineCalibrationValue(input: String): Int {
-    val sanitisedInput = input.sanitise()
-    val reverseSanitisedInput = input.reverseSanitise()
+fun determineCalibrationValuePart1(input: String): Int {
+    val firstDigit = input.first { it.isDigit() }.digitToInt()
+    val lastDigit = input.last { it.isDigit() }.digitToInt()
 
-    val firstDigit = sanitisedInput.firstOrNull { it.isDigit() }?.digitToInt() ?: return 0
-    val lastDigit = reverseSanitisedInput.lastOrNull { it.isDigit() }?.digitToInt() ?: return 0
+    return (firstDigit * 10) + lastDigit
+}
 
-    val result =  (firstDigit * 10) + lastDigit
-    println("$input -> $sanitisedInput -> $result")
+fun determineCalibrationValuePart2(input: String): Int {
+    val firstDigit = input.firstDigit()
+    val lastDigit = input.lastDigit()
 
-    return result
+    return (firstDigit * 10) + lastDigit
 }
 
 val translationMap = listOf(
-    "zero" to "0",
-    "one" to "1",
-    "two" to "2",
-    "three" to "3",
-    "four" to "4",
-    "five" to "5",
-    "six" to "6",
-    "seven" to "7",
-    "eight" to "8",
-    "nine" to "9",
+    "zero" to 0,
+    "one" to 1,
+    "two" to 2,
+    "three" to 3,
+    "four" to 4,
+    "five" to 5,
+    "six" to 6,
+    "seven" to 7,
+    "eight" to 8,
+    "nine" to 9,
+    "0" to 0,
+    "1" to 1,
+    "2" to 2,
+    "3" to 3,
+    "4" to 4,
+    "5" to 5,
+    "6" to 6,
+    "7" to 7,
+    "8" to 8,
+    "9" to 9,
 )
 
-fun String.sanitise(): String {
-    var unsanitised = this.lowercase()
-    var sanitised = ""
-
-    while (unsanitised.isNotEmpty()) {
-        val firstMatch = translationMap.firstOrNull { unsanitised.startsWith(it.first) }
-        if (firstMatch != null) {
-            sanitised += firstMatch.second
-            unsanitised = unsanitised.drop(firstMatch.first.length)
-        } else {
-            sanitised += unsanitised.take(1)
-            unsanitised = unsanitised.drop(1)
-        }
+fun String.firstDigit(): Int {
+    var input = this
+    while (input.isNotEmpty()) {
+        val firstMatch = translationMap.firstOrNull { input.startsWith(it.first) }
+        if (firstMatch != null) return firstMatch.second
+        input = input.drop(1)
     }
-
-    return sanitised
+    return 0
 }
 
-fun String.reverseSanitise(): String {
-    var unsanitised = this.lowercase().reversed()
-    var sanitised = ""
-
-    while (unsanitised.isNotEmpty()) {
-        val firstMatch = translationMap.firstOrNull { unsanitised.startsWith(it.first.reversed()) }
-        if (firstMatch != null) {
-            sanitised += firstMatch.second
-            unsanitised = unsanitised.drop(firstMatch.first.length)
-        } else {
-            sanitised += unsanitised.take(1)
-            unsanitised = unsanitised.drop(1)
-        }
+fun String.lastDigit(): Int {
+    var input = this.reversed()
+    while (input.isNotEmpty()) {
+        val firstMatch = translationMap.firstOrNull { input.startsWith(it.first.reversed()) }
+        if (firstMatch != null) return firstMatch.second
+        input = input.drop(1)
     }
-
-    return sanitised.reversed()
+    return 0
 }
