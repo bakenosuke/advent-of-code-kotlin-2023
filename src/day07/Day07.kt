@@ -1,6 +1,5 @@
 package day07
 
-import println
 import readInput
 
 fun main() {

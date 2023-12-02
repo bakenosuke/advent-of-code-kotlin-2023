@@ -1,8 +1,6 @@
 package day02
 
-import println
 import readInput
-import kotlin.math.max
 
 fun main() {
     val solver = Day02()
