@@ -6,7 +6,7 @@ fun main() {
     val solver = Day05()
     val input = readInput("src/day05/input")
     println("Part 1: ${solver.part1(input)}")
-    println("Part 2: ${solver.part2b(input)}")
+    println("Part 2: ${solver.part2(input)}")
 }
 
 class Day05 {
@@ -26,15 +26,18 @@ class Day05 {
             input.getLinesBetween("temperature-to-humidity map:", "humidity-to-location map:").readRange()
         val humidityToLocation = input.getLinesBetween("humidity-to-location map:", "").readRange()
 
+        val mappingChain = listOf(
+            seedToSoil,
+            soilToFertilizer,
+            fertilizerToWater,
+            waterToLight,
+            lightToTemperature,
+            temperatureToHumidity,
+            humidityToLocation,
+        )
+
         val seedLocations = seeds.map {
-            val soil = mapValue(it, seedToSoil)
-            val fertilizer = mapValue(soil, soilToFertilizer)
-            val water = mapValue(fertilizer, fertilizerToWater)
-            val light = mapValue(water, waterToLight)
-            val temperature = mapValue(light, lightToTemperature)
-            val humidity = mapValue(temperature, temperatureToHumidity)
-            val location = mapValue(humidity, humidityToLocation)
-            location
+           mapValueChain(it, mappingChain)
         }
         return seedLocations.min()
     }
@@ -70,37 +73,6 @@ class Day05 {
     data class MappingRange(val destStart: Long, val sourceStart: Long, val range: Long)
 
     fun part2(input: List<String>): Long {
-        val seedToSoil = input.getLinesBetween("seed-to-soil map:", "soil-to-fertilizer map:").readRange()
-        val soilToFertilizer = input.getLinesBetween("soil-to-fertilizer map:", "fertilizer-to-water map:").readRange()
-        val fertilizerToWater = input.getLinesBetween("fertilizer-to-water map:", "water-to-light map:").readRange()
-        val waterToLight = input.getLinesBetween("water-to-light map:", "light-to-temperature map:").readRange()
-        val lightToTemperature =
-            input.getLinesBetween("light-to-temperature map:", "temperature-to-humidity map:").readRange()
-        val temperatureToHumidity =
-            input.getLinesBetween("temperature-to-humidity map:", "humidity-to-location map:").readRange()
-        val humidityToLocation = input.getLinesBetween("humidity-to-location map:", "").readRange()
-
-        val seedRanges = getSeedRanges(input[0])
-
-        var minLocation = Long.MAX_VALUE
-        seedRanges.forEach { range ->
-            (0..(range.length - 1)).forEach {
-                val soil = mapValue(range.from + it, seedToSoil)
-                val fertilizer = mapValue(soil, soilToFertilizer)
-                val water = mapValue(fertilizer, fertilizerToWater)
-                val light = mapValue(water, waterToLight)
-                val temperature = mapValue(light, lightToTemperature)
-                val humidity = mapValue(temperature, temperatureToHumidity)
-                val location = mapValue(humidity, humidityToLocation)
-                if (location < minLocation) {
-                    minLocation = location
-                }
-            }
-        }
-        return minLocation
-    }
-
-    fun part2b(input: List<String>): Long {
         val seedToSoil = input.getLinesBetween("seed-to-soil map:", "soil-to-fertilizer map:").readRangeReversed()
         val soilToFertilizer =
             input.getLinesBetween("soil-to-fertilizer map:", "fertilizer-to-water map:").readRangeReversed()
@@ -113,18 +85,21 @@ class Day05 {
             input.getLinesBetween("temperature-to-humidity map:", "humidity-to-location map:").readRangeReversed()
         val humidityToLocation = input.getLinesBetween("humidity-to-location map:", "").readRangeReversed()
 
+        val mappingChain = listOf(
+            humidityToLocation,
+            temperatureToHumidity,
+            lightToTemperature,
+            waterToLight,
+            fertilizerToWater,
+            soilToFertilizer,
+            seedToSoil,
+        )
+
         val seedRanges = getSeedRanges(input[0])
         var found = false
         var i = 0L
         while (!found) {
-            val location = i
-            val humidity = mapValue(location, humidityToLocation)
-            val temperature = mapValue(humidity, temperatureToHumidity)
-            val light = mapValue(temperature, lightToTemperature)
-            val water = mapValue(light, waterToLight)
-            val fertilizer = mapValue(water, fertilizerToWater)
-            val soil = mapValue(fertilizer, soilToFertilizer)
-            val seed = mapValue(soil, seedToSoil)
+            val seed = mapValueChain(i, mappingChain)
             if (exists(seed, seedRanges)) {
                 found = true
             } else {
@@ -132,6 +107,14 @@ class Day05 {
             }
         }
 
+        return i
+    }
+
+    fun mapValueChain(value:Long, ranges:List<List<MappingRange>>): Long {
+        var i = value
+        ranges.forEach {
+            i = mapValue(i, it)
+        }
         return i
     }
 
