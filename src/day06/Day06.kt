@@ -15,10 +15,9 @@ class Day06 {
         val time = input[0].substringAfter(":").readNumbers()
         val distance = input[1].substringAfter(":").readNumbers()
 
-        val solutions = (0..(time.size - 1)).map {
+        val solutions = time.indices.map {
             getNumberOfSolutions(time[it].toLong(), distance[it].toLong())
         }
-        println(solutions)
         var result = 1
         solutions.forEach {
             result *= it
@@ -34,7 +33,7 @@ class Day06 {
         var solutions = 0
         (1..time).forEach {
             val timeToFinish = it.toDouble() + (distance.toDouble() / it.toDouble())
-            if(timeToFinish < time) {
+            if (timeToFinish < time) {
                 solutions++
             }
         }
@@ -42,8 +41,8 @@ class Day06 {
     }
 
     fun part2(input: List<String>): Int {
-        val time = input[0].substringAfter(":").replace(" ","").toLong()
-        val distance = input[1].substringAfter(":").replace(" ","").toLong()
+        val time = input[0].substringAfter(":").replace(" ", "").toLong()
+        val distance = input[1].substringAfter(":").replace(" ", "").toLong()
         return getNumberOfSolutions(time, distance)
     }
 
