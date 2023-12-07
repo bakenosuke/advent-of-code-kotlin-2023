@@ -23,4 +23,7 @@ tasks {
     wrapper {
         gradleVersion = "8.5"
     }
+    test {
+        useJUnitPlatform()
+    }
 }
