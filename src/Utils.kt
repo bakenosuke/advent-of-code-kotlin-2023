@@ -19,3 +19,9 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
  * The cleaner shorthand for printing output.
  */
 fun Any?.println() = println(this)
+
+fun <T> timer(call: () -> T) {
+    val start = System.currentTimeMillis()
+    call.invoke()
+    println("${System.currentTimeMillis() - start} ms")
+}
