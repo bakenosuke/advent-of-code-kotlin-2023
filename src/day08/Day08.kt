@@ -22,18 +22,12 @@ class Day08 {
 
     fun part1(input: List<String>): Int {
         val instructions = input[0].toCharArray()
-        val mappings = input.drop(2).map {
-            val key = it.substringBefore(" = ")
-            val l = it.substringAfter(" = ").replace("(", "").replace(")", "").substringBefore(",").trim()
-            val r = it.substringAfter(" = ").replace("(", "").replace(")", "").substringAfter(",").trim()
-
-            key to Group(l, r)
-        }
-
-        return instructions.follow(mappings.toMap(), "AAA", "ZZZ")
+        val mappings = input.loadMappings()
+        println(mappings)
+        return instructions.follow(mappings, "AAA", "ZZZ")
     }
 
-    fun CharArray.follow(mappings: Map<String, Group>, start: String, target: String): Int {
+    fun CharArray.follow(mappings: Map<String, String>, start: String, target: String): Int {
         var current = start
         var steps = 0
 
@@ -41,32 +35,37 @@ class Day08 {
             forEach { instruction ->
                 if (current == target) return steps
 
-                val mapping = mappings[current]!!
-                current = if (instruction == 'L') mapping.l else mapping.r
+                current = mappings[current + instruction]!!
                 steps++
             }
         }
     }
 
+    fun List<String>.loadMappings(): Map<String, String> {
+        val mappings = mutableMapOf<String, String>()
+        drop(2).forEach {
+            val key = it.substring(0, 3)
+
+            mappings["${key}L"] = it.substring(7, 10)
+            mappings["${key}R"] = it.substring(12, 15)
+        }
+        return mappings
+    }
+
     fun part2(input: List<String>): Long {
         val instructions = input[0].toCharArray()
-        val mappings = input.drop(2).map {
-            val key = it.substringBefore(" = ")
-            val l = it.substringAfter(" = ").replace("(", "").replace(")", "").substringBefore(",").trim()
-            val r = it.substringAfter(" = ").replace("(", "").replace(")", "").substringAfter(",").trim()
+        val mappings = input.loadMappings()
 
-            key to Group(l, r)
-        }
-
-        val starts = mappings.map { it.first }.filter { it.endsWith("A") }
+        val starts = mappings.map { it.key.dropLast(1) }.filter { it.endsWith("A") }
         val firstZ = mutableListOf<Long>()
         runBlocking {
             starts.forEach {
                 launch {
-                    firstZ.add(instructions.follow(mappings.toMap(), listOf(it), "Z"))
+                    firstZ.add(instructions.follow(mappings, listOf(it), "Z"))
                 }
             }
         }
+
 
         var stepSize = firstZ.max()
         var steps = stepSize
@@ -77,17 +76,16 @@ class Day08 {
         }
     }
 
-    fun CharArray.follow(mappings: Map<String, Group>, start: List<String>, target: String): Long {
+    fun CharArray.follow(mappings: Map<String, String>, start: List<String>, target: String): Long {
         var current = start
         var steps = 0L
 
         while (true) {
             forEach { instruction ->
-                if (current.all { it.endsWith(target) } && steps != 0L) return steps
+                if (current.all { it.endsWith(target) }) return steps
 
                 current = current.map {
-                    val mapping = mappings[it]!!
-                    if (instruction == 'L') mapping.l else mapping.r
+                    mappings[it + instruction]!!
                 }
                 steps++
             }
