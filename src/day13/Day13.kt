@@ -11,11 +11,11 @@ fun main() {
 
 class Day13 {
 
-    fun part1(input: List<String>): Int {
+    fun part1(input: List<String>): Long {
         return 0
     }
 
-    fun part2(input: List<String>): Int {
+    fun part2(input: List<String>): Long {
         return 0
     }
 
