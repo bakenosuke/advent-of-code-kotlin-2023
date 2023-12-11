@@ -15,21 +15,21 @@ fun main() {
 class Day11 {
 
     data class Location(
-        val id: Int,
-        var row: Int = -1,
-        var col: Int = -1,
-        var distance: Int = 1
+        val id: Long,
+        var row: Long = -1,
+        var col: Long = -1,
+        var distance: Long = 1
     )
 
-    fun part1(input: List<String>): Int {
-        var i = 0
+    fun part1(input: List<String>): Long {
+        var i = 0L
         var map = input.mapIndexed { rowIndex, row ->
             row.mapIndexed { colIndex, col ->
                 if (col == '#') {
                     i++
-                    Location(i, rowIndex, colIndex)
+                    Location(i, rowIndex.toLong() ,colIndex.toLong())
                 } else {
-                    Location(-1, rowIndex, colIndex)
+                    Location(-1, rowIndex.toLong(), colIndex.toLong())
                 }
             }.toMutableList()
         }.toMutableList()
@@ -48,23 +48,23 @@ class Day11 {
         }
     }
 
-    fun distance(from: Location, to: Location, map: MutableList<MutableList<Location>>): Int {
+    fun distance(from: Location, to: Location, map: MutableList<MutableList<Location>>): Long {
         val fromCol = min(from.col, to.col)
         val toCol = max(from.col, to.col)
         val colDistance = (fromCol until toCol).sumOf {
-            map[0][it].distance
+            map[0][it.toInt()].distance
         }
 
         val fromRow = min(from.row, to.row)
         val toRow = max(from.row, to.row)
         val rowDistance = (fromRow until toRow).sumOf {
-            map[it][0].distance
+            map[it.toInt()][0].distance
         }
 
         return colDistance + rowDistance
     }
 
-    fun distance(from: Location, to: Location): Int {
+    fun distance(from: Location, to: Location): Long {
         return abs(from.row - to.row) + abs(from.col - to.col)
     }
 
@@ -79,19 +79,13 @@ class Day11 {
     }
 
     fun MutableList<MutableList<Location>>.getLocations(): MutableList<Location> {
-        val locations = mutableListOf<Location>()
-        forEachIndexed { rowIndex, row ->
-            row.forEachIndexed { colIndex, cell ->
-                if (cell.id != -1) locations.add(cell)
-            }
-        }
-        return locations
+        return flatMap { it }.filter { it.id != -1L }.toMutableList()
     }
 
     fun MutableList<MutableList<Location>>.print() {
         forEach { row ->
             row.forEach { col ->
-                if (col.id == -1) {
+                if (col.id == -1L) {
                     print("[       ]")
                 } else {
                     print("[${col.id.toString().padStart(7)}]")
@@ -101,11 +95,11 @@ class Day11 {
         }
     }
 
-    fun MutableList<MutableList<Location>>.expand(times: Int = 2): MutableList<MutableList<Location>> {
+    fun MutableList<MutableList<Location>>.expand(times: Long = 2): MutableList<MutableList<Location>> {
         val emptyRows = (0 until this.size).filter { row ->
             var hasContent = false
             for (col in 0 until this[row].size) {
-                if (this[row][col].id != -1) {
+                if (this[row][col].id != -1L) {
                     hasContent = true
                     break
                 }
@@ -115,7 +109,7 @@ class Day11 {
         val emptyCols = (0 until this.size).filter { col ->
             var hasContent = false
             for (row in 0 until this.size) {
-                if (this[row][col].id != -1) {
+                if (this[row][col].id != -1L) {
                     hasContent = true
                     break
                 }
@@ -136,7 +130,7 @@ class Day11 {
 
         expanded.forEach { row ->
             row.forEach { cell ->
-                if (cell.id != -1) {
+                if (cell.id != -1L) {
                     cell.row += emptyRows.count { it < cell.row } * (times - 1)
                     cell.col += emptyCols.count { it < cell.col } * (times - 1)
                 }
@@ -146,15 +140,15 @@ class Day11 {
         return expanded
     }
 
-    fun part2(input: List<String>, times: Int): Int {
+    fun part2(input: List<String>, times: Long): Long {
         var i = 0
         var map = input.mapIndexed { rowIndex, row ->
             row.mapIndexed { colIndex, col ->
                 if (col == '#') {
                     i++
-                    Location(i, rowIndex, colIndex)
+                    Location(i.toLong(), rowIndex.toLong(), colIndex.toLong())
                 } else {
-                    Location(-1, rowIndex, colIndex)
+                    Location(-1, rowIndex.toLong(), colIndex.toLong())
                 }
             }.toMutableList()
         }.toMutableList()
