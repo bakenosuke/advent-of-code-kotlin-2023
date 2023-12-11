@@ -11,18 +11,27 @@ class Day11Test {
     @Test
     fun `should match part 1 example`() {
         val input = readInput("test/day11/part1")
-        val expected = 4361
+        val expected = 374
 
         val result = solver.part1(input)
         result shouldBe expected
     }
 
     @Test
-    fun `should match part 2 example`() {
+    fun `should match part 2a example`() {
         val input = readInput("test/day11/part1")
-        val expected = 467835
+        val expected = 1030
 
-        val result = solver.part2(input)
+        val result = solver.part2(input, 10)
+        result shouldBe expected
+    }
+
+    @Test
+    fun `should match part 2b example`() {
+        val input = readInput("test/day11/part1")
+        val expected = 8410
+
+        val result = solver.part2(input, 100)
         result shouldBe expected
     }
 
