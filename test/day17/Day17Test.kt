@@ -11,7 +11,7 @@ class Day17Test {
     @Test
     fun `should match part 1 example`() {
         val input = readInput("test/day17/part1")
-        val expected = 4361
+        val expected = 107
 
         val result = solver.part1(input)
         result shouldBe expected
